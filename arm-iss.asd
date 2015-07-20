@@ -19,7 +19,7 @@
 
 (defsystem #:arm-iss
   :description "Instruction set simulator for the ARM architecture"
-  :author "Jacob Mitchell <jacob.d.mitchell@gmail.com>"
+  :author "Jacob Mitchell <jmitchell@member.fsf.org>"
   :version (:read-file-form "version.sexp")
   :license "GPLv3"
   :serial t
@@ -28,7 +28,7 @@
                (:file "arm-iss")))
 
 (defsystem #:arm-iss/test
-  :author "Jacob Mitchell <jacob.d.mitchell@gmail.com>"
+  :author "Jacob Mitchell <jmitchell@member.fsf.org>"
   :version (:read-file-form "version.sexp")
   :depends-on (:arm-iss :fiveam)
   :pathname "tests/"
