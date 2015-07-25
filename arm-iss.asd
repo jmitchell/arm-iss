@@ -34,9 +34,6 @@
   :pathname "tests/"
   :components ((:file "test")))
 
-;; TODO(jake): Is this actually doing anything? The tests don't seem
-;; to run when either system is loaded into the REPL using
-;; QL:QUICKLOAD or ASDF:LOAD-SYSTEM.
 (defmethod perform ((o test-op) (c (eql (find-system :arm-iss))))
   (load-system :arm-iss/test :force '(:arm-iss/test))
   (uiop:symbol-call :5am :run! :arm-iss))
