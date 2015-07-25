@@ -2,6 +2,24 @@
 
 (in-package #:arm-iss)
 
+;; TODO: Extract generic bitfield concepts from register class into a
+;; base class. It will be used by registers, buses, and other chip
+;; components.
+
+;; TODO: Develop interpretations of bitfields like signed and unsigned
+;; integers.
+
+;; TODO: Implement barrel shifter operations in terms of high-level
+;; bitfield interpretations. Barrel shifter doesn't need to know about
+;; registers; an intermediary device will lookup the appropriate
+;; register's bitfield and relay those values to the barrel shifter.
+
+;; TODO: Enforce cleaner abstraction layers in ASDF systems and
+;; packages. Tests should operate on the highest-level interfaces of
+;; any given abstraction, but this doesn't mean all low-level
+;; abstraction interfaces (e.g. barrel shifter functions) should be
+;; exported by the :arm-iss package.
+
 (defvar *register-width* 32)
 
 (defclass register ()
