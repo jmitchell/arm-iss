@@ -7,8 +7,36 @@
 (def-suite :arm-iss)
 (in-suite :arm-iss)
 
-(test passing-dummy-test
-      (is (= 0 (dummy-fn))))
+(test new-register-is-expected-length
+  (let ((reg (make-instance 'register)))
+    (with-slots (bitfield) reg
+      (is (= 32 (length bitfield))))))
 
-(test failing-dummy-test
-      (is (= 0 1)))
+(test set-register-bit-range
+  (let ((reg (make-instance 'register)))
+    (is (equal (bits reg 4 0) #*00000))
+    (setf (bits reg 4 0) #*11100)
+    (is (equal (bits reg 4 0) #*11100))
+    (is (equal (bit-at reg 4) 1))
+    (is (equal (bit-at reg 0) 0))
+
+    (is (equal (bit-at reg 15) 0))
+    (setf (bit-at reg 15) 1)
+    (is (equal (bit-at reg 15) 1))))
+
+(test check-and-set-program-status-register-flags
+  (let ((psr (make-instance 'program-status-register)))
+    (loop
+       for flag in (mapcar #'cdr *psr-flags*)
+       do (progn
+            (is (= (flag-state psr flag) 0)
+                (setf (flag-state psr flag) 1)
+                (is (= (flag-state psr flag) 1)))))))
+
+(test check-and-set-program-status-modes
+  (let ((psr (make-instance 'program-status-register)))
+    (is (equal (mode psr) :svc))
+    (setf (mode psr) :usr)
+    (is (equal (mode psr) :usr))
+    (setf (mode psr) :sys)
+    (is (equal (mode psr) :sys))))
