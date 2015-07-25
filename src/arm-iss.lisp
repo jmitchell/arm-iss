@@ -2,13 +2,15 @@
 
 (in-package #:arm-iss)
 
+(defmacro assert-in-range (val lo hi)
+  `(assert (and (>= ,val ,lo)
+                (<= ,val ,hi))
+           nil
+           "~a must be between ~a and ~a, inclusive" ',val ,lo ,hi))
+
+
 ;; TODO: Develop interpretations of bitfields like signed and unsigned
 ;; integers.
-
-;; TODO: Implement barrel shifter operations in terms of high-level
-;; bitfield interpretations. Barrel shifter doesn't need to know about
-;; registers; an intermediary device will lookup the appropriate
-;; register's bitfield and relay those values to the barrel shifter.
 
 ;; TODO: Enforce cleaner abstraction layers in ASDF systems and
 ;; packages. Tests should operate on the highest-level interfaces of
@@ -121,3 +123,59 @@
     (if pair
         (setf (bits psr 4 0) (car pair))
         (error "Unrecognized mode identifier"))))
+
+
+;; BARREL SHIFTER OPERATIONS
+
+(defgeneric logical-shift-left (bf shift-amount))
+(defgeneric logical-shift-right (bf shift-amount))
+(defgeneric arithmetic-right-shift (bf shift-amount))
+(defgeneric rotate-right (bf shift-amount))
+(defgeneric rotate-right-extended (bf carry))
+
+(defmethod logical-shift-left ((bf bitfield) shift-amount)
+  (assert-in-range shift-amount 0 (1- (width bf)))
+  (let* ((new-bf (make-instance 'bitfield :width (width bf)))
+         (hi (- (width bf) shift-amount))
+         (bits-to-copy (bits bf (1- hi) 0)))
+    (setf (bits new-bf (1- (width bf)) shift-amount)
+          bits-to-copy)
+    ;; TODO: verify condition flag conformance.
+    new-bf))
+
+(defmethod logical-shift-right ((bf bitfield) shift-amount)
+  (assert-in-range shift-amount 1 (width bf))
+  (let* ((new-bf (make-instance 'bitfield :width (width bf)))
+         (bits-to-copy (bits bf (1- (width bf)) shift-amount)))
+    (setf (bits new-bf (- (1- (width bf)) shift-amount) 0)
+          bits-to-copy)
+    ;; TODO: verify condition flag conformance.
+    new-bf))
+
+(defmethod arithmetic-right-shift ((bf bitfield) shift-amount)
+  (assert-in-range shift-amount 1 (width bf))
+  (let* ((new-bf (logical-shift-right bf shift-amount))
+         (w (width bf))
+         (sticky-index (1- w))
+         (sticky-bit (bit-at bf sticky-index)))
+    (setf (bits new-bf sticky-index (- w shift-amount))
+          (make-array shift-amount :element-type 'bit :initial-element sticky-bit))
+    ;; TODO: verify condition flag conformance.
+    new-bf))
+
+(defmethod rotate-right ((bf bitfield) shift-amount)
+  (assert-in-range shift-amount 1 (1- (width bf)))
+  (let* ((w (width bf))
+         (hi-src (bits bf (1- w) shift-amount))
+         (lo-src (bits bf (1- shift-amount) 0))
+         (new-bf (make-instance 'bitfield :width w)))
+    ;; TODO: verify condition flag conformance.
+    (setf (bits new-bf (1- (- w shift-amount)) 0) hi-src
+          (bits new-bf (1- w) (- w shift-amount)) lo-src)
+    new-bf))
+
+(defmethod rotate-right-extended ((bf bitfield) carry)
+  (let* ((new-bf (logical-shift-right bf 1)))
+    ;; TODO: verify condition flag conformance.
+    (setf (bit-at new-bf (1- (width bf))) carry)
+    new-bf))

@@ -6,8 +6,15 @@
            #:width
            #:bits
            #:bit-at
+
            #:register
            #:program-status-register
            #:*psr-flags*
            #:flag-state
-           #:mode))
+           #:mode
+
+           #:logical-shift-left
+           #:logical-shift-right
+           #:arithmetic-right-shift
+           #:rotate-right
+           #:rotate-right-extended))
