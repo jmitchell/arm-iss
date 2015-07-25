@@ -2,11 +2,11 @@
 
 (defpackage #:arm-iss
   (:use #:cl)
-  (:export #:register
-           #:bitfield
+  (:export #:bitfield
+           #:width
            #:bits
            #:bit-at
-
+           #:register
            #:program-status-register
            #:*psr-flags*
            #:flag-state

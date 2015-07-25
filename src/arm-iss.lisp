@@ -2,10 +2,6 @@
 
 (in-package #:arm-iss)
 
-;; TODO: Extract generic bitfield concepts from register class into a
-;; base class. It will be used by registers, buses, and other chip
-;; components.
-
 ;; TODO: Develop interpretations of bitfields like signed and unsigned
 ;; integers.
 
@@ -20,38 +16,52 @@
 ;; abstraction interfaces (e.g. barrel shifter functions) should be
 ;; exported by the :arm-iss package.
 
-(defvar *register-width* 32)
 
-(defclass register ()
-  ((bitfield
-    :initform (make-array *register-width*
-                          :element-type 'bit)
-    :type (simple-bit-vector *register-width*))))
+(defclass bitfield ()
+  ((width
+    :initarg :width
+    :reader width
+    :initform (error "bitfield :width must be specified.")
+    :type (integer 1 *))
+   (bit-array
+    :accessor bit-array
+    :type simple-bit-vector)))
 
-(defgeneric bits (register hi lo))
-(defgeneric (setf bits) (value register hi lo))
-(defgeneric bit-at (register index))
-(defgeneric (setf bit-at) (value register index))
+(defmethod initialize-instance :after
+    ((bf bitfield) &rest args)
+  (declare (ignore args))
+  (unless (slot-boundp bf 'bit-array)
+    (setf (slot-value bf 'bit-array)
+          (make-array (width bf) :element-type 'bit))))
 
-(defmethod bits ((reg register) hi lo)
-  (with-slots (bitfield) reg
-    (reverse (subseq bitfield lo (1+ hi)))))
+(defgeneric bits (bitfield hi lo))
+(defgeneric (setf bits) (value bitfield hi lo))
+(defgeneric bit-at (bitfield index))
+(defgeneric (setf bit-at) (value bitfield index))
 
-(defmethod (setf bits) (value (reg register) hi lo)
-  (with-slots (bitfield) reg
-    (setf (subseq bitfield lo (1+ hi))
-          (reverse value)))
+(defmethod bits ((bf bitfield) hi lo)
+  (reverse (subseq (bit-array bf) lo (1+ hi))))
+
+(defmethod (setf bits) (value (bf bitfield) hi lo)
+  (setf (subseq (bit-array bf) lo (1+ hi))
+        (reverse value))
   value)
 
-(defmethod bit-at ((reg register) index)
-  (bit (bits reg index index) 0))
+(defmethod bit-at ((bf bitfield) index)
+  (bit (bits bf index index) 0))
 
-(defmethod (setf bit-at) (value (reg register) index)
-  (setf (bits reg index index)
+(defmethod (setf bit-at) (value (bf bitfield) index)
+  (setf (bits bf index index)
         (make-array 1
                     :element-type 'bit
                     :initial-element value)))
 
+
+(defvar *register-width* 32)
+
+(defclass register (bitfield)
+  ((width
+    :initform *register-width*)))
 
 (defclass program-status-register (register)
   ())

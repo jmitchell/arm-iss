@@ -9,8 +9,7 @@
 
 (test new-register-is-expected-length
   (let ((reg (make-instance 'register)))
-    (with-slots (bitfield) reg
-      (is (= 32 (length bitfield))))))
+    (is (= 32 (width reg)))))
 
 (test set-register-bit-range
   (let ((reg (make-instance 'register)))
