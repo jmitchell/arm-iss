@@ -97,6 +97,7 @@
     (#*11111 . :sys)))
 
 (defgeneric mode (psr))
+(defgeneric (setf mode) (value psr))
 
 (defmethod mode ((psr program-status-register))
   (let* ((mode-bits (bits psr 4 0))
