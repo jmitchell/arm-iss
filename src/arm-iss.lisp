@@ -8,10 +8,6 @@
            nil
            "~a must be between ~a and ~a, inclusive" ',val ,lo ,hi))
 
-
-;; TODO: Develop interpretations of bitfields like signed and unsigned
-;; integers.
-
 ;; TODO: Enforce cleaner abstraction layers in ASDF systems and
 ;; packages. Tests should operate on the highest-level interfaces of
 ;; any given abstraction, but this doesn't mean all low-level
@@ -57,6 +53,41 @@
         (make-array 1
                     :element-type 'bit
                     :initial-element value)))
+
+
+(defgeneric bitfield->unsigned-integer (bitfield))
+
+(defmethod bitfield->unsigned-integer ((bf bitfield))
+  (loop
+     for b across (reverse (bits bf (1- (width bf)) 0))
+     for i = 0 then (1+ i)
+     sum (if (zerop b)
+             0
+             (ash 1 i))))
+
+(defgeneric unsigned-integer->bitfield (n &key width))
+
+(defmethod unsigned-integer->bitfield (n &key (width *register-width*))
+  (assert (typep n '(integer 0 *))
+          nil
+          "N must be a non-negative integer")
+  (assert (typep width '(integer 1 *))
+          nil
+          "WIDTH must be a positive integer")
+  (let ((bf (make-instance 'bitfield :width width)))
+    (setf (bits bf (1- width) 0)
+          (reverse
+           (concatenate 'simple-bit-vector
+                       (loop
+                          repeat width
+                          for v = n then (ash v -1)
+                          when (> v 0)
+                          collect (if (evenp v) 0 1)))))
+    bf))
+
+;; TODO: Develop conversion methods between bitfields and signed
+;; integers.
+
 
 
 (defvar *register-width* 32)

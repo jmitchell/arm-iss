@@ -101,3 +101,20 @@
 ;; TODO: Test interactions between barrel shifter operations and
 ;; CPSR. Be mindful of possible timing constraints imposed by pipeline
 ;; model.
+
+
+(test unsigned-integer->bitfield
+  (let ((bf))
+    (setf bf (unsigned-integer->bitfield 500 :width 10))
+    (is (equal (bits bf 9 0) #*0111110100))
+
+    (setf bf (unsigned-integer->bitfield 89712346876128376486578 :width 1))
+    (is (equal (bits bf 0 0) #*0))))
+
+(test bitfield->unsigned-integer
+  (let ((bf (make-instance 'bitfield :width 32)))
+    (setf (bits bf 31 0) #*11101111001001101010100010010001)
+    (is (= (bitfield->unsigned-integer bf) 4012288145))
+
+    (setf (bits bf 31 0) #*00000000000000000000000000000001)
+    (is (= (bitfield->unsigned-integer bf) 1))))

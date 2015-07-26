@@ -6,6 +6,8 @@
            #:width
            #:bits
            #:bit-at
+           #:bitfield->unsigned-integer
+           #:unsigned-integer->bitfield
 
            #:register
            #:program-status-register
