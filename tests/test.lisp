@@ -7,6 +7,9 @@
 (def-suite :arm-iss)
 (in-suite :arm-iss)
 
+(test dummy-failure
+  (is-true nil))
+
 (test new-register-is-expected-length
   (let ((reg (make-instance 'register)))
     (is (= 32 (width reg)))))
