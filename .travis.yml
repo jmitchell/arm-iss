@@ -40,10 +40,7 @@ before_script:
 # to do unit testing; other frameworks will have different ways of
 # determining whether a test suite fails or succeeds.
 script:
-  - cl -e '(load "arm-iss.asd")
-           (ql:quickload :arm-iss/test)
-           (unless (asdf:operate \'asdf:test-op :arm-iss)
-             (uiop:quit 1))';
+  - cl -e "(progn (load \"arm-iss.asd\") (ql:quickload :arm-iss/test) (unless (asdf:operate 'asdf:test-op :arm-iss) (uiop:quit 1)))";
 
   # testing (albeit not extensively) that, even when invoked directly,
   # Lisps still have Quicklisp available.
