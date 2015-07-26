@@ -30,7 +30,7 @@
   (declare (ignore args))
   (unless (slot-boundp bf 'bit-array)
     (setf (slot-value bf 'bit-array)
-          (make-array (width bf) :element-type 'bit))))
+          (make-array (width bf) :element-type 'bit :initial-element 0))))
 
 (defgeneric bits (bitfield hi lo))
 (defgeneric (setf bits) (value bitfield hi lo))
