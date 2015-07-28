@@ -33,7 +33,3 @@
   :depends-on (:arm-iss :fiveam)
   :pathname "tests/"
   :components ((:file "test")))
-
-(defmethod perform ((o test-op) (c (eql (find-system :arm-iss))))
-  (load-system :arm-iss/test :force '(:arm-iss/test))
-  (uiop:symbol-call :5am :run! :arm-iss))

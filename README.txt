@@ -26,4 +26,6 @@ Goals
 Running tests
 -------------
 
-    (asdf:operate 'asdf:test-op :arm-iss)
+    (push #p"./" asdf:*central-registry*)
+    (ql:quickload "arm-iss/test")
+    (arm-iss-test:run-tests)

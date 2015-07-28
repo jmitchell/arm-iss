@@ -4,6 +4,13 @@
 
 (in-package #:arm-iss-test)
 
+(defun run-tests ()
+  (let* ((result-list (5am:run :arm-iss))
+         (status (5am:results-status result-list)))
+    (explain! result-list)
+    status))
+
+
 (def-suite :arm-iss)
 (in-suite :arm-iss)
 
